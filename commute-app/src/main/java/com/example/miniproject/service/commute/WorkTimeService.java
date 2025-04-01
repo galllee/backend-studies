@@ -29,7 +29,7 @@ public class WorkTimeService {
     private final CommuteRepository commuteRepository;
     private final LeaveRequestRepository leaveRequestRepository;
     private final MemberRepository memberRepository;
-
+    private static final int DAILY_WORK_MINUTES = 8 * 60;
 //    private boolean isOnLeave(Long memberId, LocalDate date) {
 //        return leaveRequestRepository.findByMemberIdAndLeaveDate(memberId, date).isPresent();
 //    }
@@ -43,6 +43,7 @@ public class WorkTimeService {
                 .map(commute -> new DailyWorkResponse(commute.getWorkDate(), Duration.between(commute.getClockIn(), commute.getClockOut()).toMinutes()))
                 .collect(Collectors.toList());
     }
+
     private List<LocalDate> getAllDatesOfMonth(YearMonth yearMonth) {
         return IntStream.rangeClosed(1, yearMonth.lengthOfMonth())
                 .mapToObj(yearMonth::atDay)
@@ -80,12 +81,12 @@ public class WorkTimeService {
         return list.stream().mapToLong(DailyWorkResponse::getWorkingMinutes).sum();
     }
 
-    private long countWeekendsInMonth(YearMonth yearMonth) {
+    private long getWorkingDaysInMonth(YearMonth yearMonth) {
         return IntStream.rangeClosed(1, yearMonth.lengthOfMonth())
                 .mapToObj(yearMonth::atDay)
                 .filter(date -> {
                     DayOfWeek day = date.getDayOfWeek();
-                    return day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
+                    return day != DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
                 })
                 .count();
     }
@@ -119,16 +120,15 @@ public class WorkTimeService {
 
     @Transactional
     public List<OverTimeResponse> getOvertime(YearMonth yearMonth) {
-        long workLimit = 8 * 60 * (yearMonth.lengthOfMonth() - countWeekendsInMonth(yearMonth));
+        long workLimit = DAILY_WORK_MINUTES * getWorkingDaysInMonth(yearMonth);
         //공휴일 추가: 내가 직접 넣어주거나 공공데이터 쓰기
-        return memberRepository.findAll().stream().map(
-                member -> {
-                    long difference = calculateTotalMinutes(personalMonthWorkTime(member.getId(), yearMonth)) - workLimit;
-                    if (difference < 0) {
-                        return new OverTimeResponse(member.getId(), member.getName(), 0);
-                    } else {
-                        return new OverTimeResponse(member.getId(), member.getName(), difference);
-                    }
-                }).collect(Collectors.toList());
+
+        return memberRepository.findAll().stream()
+                .map(member -> {
+                    long worked = calculateTotalMinutes(personalMonthWorkTime(member.getId(), yearMonth));
+                    long overtime = Math.max(worked - workLimit, 0);
+                    return new OverTimeResponse(member.getId(), member.getName(), overtime);
+                })
+                .collect(Collectors.toList());
     }
 }

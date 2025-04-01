@@ -25,9 +25,16 @@ import java.util.stream.IntStream;
 @Service
 public class CommuteService {
     private final CommuteRepository commuteRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void clockIn(ClockInRequest request) {
+        if (!memberRepository.existsById(request.getMemberId())) {
+            throw new IllegalArgumentException("등록되지 않은 직원입니다.");
+        }
+        if (commuteRepository.existsByMemberIdAndClockOutIsNull(request.getMemberId())) {
+            throw new IllegalArgumentException("이미 출근 중입니다. 퇴근 후 다시 시도하세요.");
+        }
         commuteRepository.save(new Commute(
                 request.getMemberId(),
                 request.getWorkDate(),
@@ -36,7 +43,10 @@ public class CommuteService {
 
     @Transactional
     public void clockOut(Long memberId) {
-        commuteRepository.findById(memberId).ifPresent(commute -> {
+        if (!commuteRepository.existsByMemberIdAndClockOutIsNotNull(memberId)) {
+            throw new IllegalArgumentException("출근하지 않았거나 이미 퇴근한 직원입니다.");
+        }
+        commuteRepository.findByMemberIdAndClockOutIsNull(memberId).ifPresent(commute -> {
             commute.clockOutAt(LocalTime.now());
         });
     }
