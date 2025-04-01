@@ -2,8 +2,6 @@ package com.example.miniproject.controller.commute;
 
 import com.example.miniproject.dto.request.commute.ClockInRequest;
 import com.example.miniproject.dto.request.commute.ClockOutRequest;
-import com.example.miniproject.dto.request.commute.WorkTimeRequest;
-import com.example.miniproject.dto.response.commute.WorkTimeResponse;
 import com.example.miniproject.service.commute.CommuteService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +21,4 @@ public class CommuteController {
         commuteService.clockOut(request.getMemberId());
     }
 
-    @GetMapping("/api/v1/member/work-time")
-    public WorkTimeResponse getWorkTime(WorkTimeRequest request) {
-        System.out.println("request: " + request.getMemberId() + request.getYearMonth());
-        return commuteService.getWorkTime(request);
-    }
 }

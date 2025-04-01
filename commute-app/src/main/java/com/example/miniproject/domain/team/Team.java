@@ -16,6 +16,7 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private int leaveNoticeDays;
 
     public Team(String name) {
         this.name = name;

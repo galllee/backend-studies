@@ -12,4 +12,10 @@ import java.time.LocalDate;
 public class DailyWorkResponse {
     private LocalDate date;
     private long workingMinutes;
+    private boolean usingLeave;
+
+    public DailyWorkResponse(LocalDate workDate, long minutes) {
+        this.date = workDate;
+        this.workingMinutes = minutes;
+    }
 }
