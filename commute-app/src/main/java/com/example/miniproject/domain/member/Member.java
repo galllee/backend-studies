@@ -2,6 +2,7 @@ package com.example.miniproject.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,6 +27,7 @@ public class Member {
     //그걸 위해서 연관관계 매핑이 필요한거맞나? 외래키를 참조한다고
     //객체에서 연관관계 매핑을 꼭 해줄필요는 없는거같은데
 
+    @Builder
     public Member(String name, Role role, LocalDate hireDate, LocalDate birthDate, Long teamId) {
         this.name = name;
         this.role = role;

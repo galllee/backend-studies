@@ -1,6 +1,7 @@
 package com.example.miniproject.domain.commute;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ public class Commute {
 
     private LocalTime clockOut;
 
+    @Builder
     public Commute(Long memberId, LocalDate workDate, LocalTime clockIn) {
         this.memberId = memberId;
         this.workDate = workDate;

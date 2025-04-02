@@ -20,7 +20,14 @@ public class MemberService {
 
     @Transactional
     public void saveMember(CreateMemberRequest request) {
-        memberRepository.save(new Member(request.getName(), request.getRole(), request.getHireDate(), request.getBirthDate(), request.getTeamId()));
+        memberRepository.save(Member.builder()
+                .name(request.getName())
+                .role(request.getRole())
+                .hireDate(request.getHireDate())
+                .birthDate(request.getBirthDate())
+                .teamId(request.getTeamId())
+                .build());
+                //new Member(request.getName(), request.getRole(), request.getHireDate(), request.getBirthDate(), request.getTeamId()));
     }
 
     @Transactional
