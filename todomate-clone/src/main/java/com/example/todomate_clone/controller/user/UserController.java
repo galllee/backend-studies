@@ -17,7 +17,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/api/v1/signup/request") //생성
+    @PostMapping("/api/v1/users") //생성
     public ResponseEntity<ApiResponse<?>> createUser(@RequestBody CreateUserRequest request) {
         userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED)

@@ -24,7 +24,13 @@ public class SignupService {
             throw new CustomException("이미 사용 중인 이메일입니다.");
         }
         String token = UUID.randomUUID().toString();
-        signupMemoryStore.save(token, new SignupTempData(request.getEmail(), request.getPassword(), request.isAgreeToMarketing()));
+        signupMemoryStore.save(token,
+                SignupTempData.builder()
+                        .email(request.getEmail())
+                        .password(request.getPassword())
+                        .agreeToMarketing(request.isAgreeToMarketing())
+                        .build()
+                );
 
         emailService.sendVerificationEmail(request.getEmail(), token);
     }
@@ -35,10 +41,15 @@ public class SignupService {
             throw new CustomException("유효하지 않은 토큰입니다.");
         }
 
+        tempData.markVerified();
     }
 
     public void signupComplete (SignupCompleteRequest request) {
         SignupTempData tempData = signupMemoryStore.get(request.getToken());
+        if (tempData == null || !tempData.isVerified()) {
+            throw new CustomException("이메일 인증을 완료해주세요.");
+        }
+
         userRepository.save(
                 User.builder()
                         .name(request.getName())
