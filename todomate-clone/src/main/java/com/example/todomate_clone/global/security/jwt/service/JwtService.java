@@ -17,7 +17,7 @@ public interface JwtService {
 
     Optional<String> extractAccessToken(HttpServletRequest request);
     Optional<String> extractRefreshToken(HttpServletRequest request);
-    Optional<String> extractEmail(String email);
+    Optional<String> extractEmail(String accessToken);
 
     void setAccessTokenHeader(HttpServletResponse response, String accessToken);
     void setRefreshTokenHeader(HttpServletResponse response, String refreshToken);

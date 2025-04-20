@@ -37,7 +37,7 @@ public class JwtServiceImpl implements JwtService {
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     private static final String USERNAME_CLAIM = "email";
-    private static final String BEARER = "Bearer";
+    private static final String BEARER = "Bearer ";
 
     private final UserRepository userRepository;
 
@@ -136,6 +136,9 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean isTokenValid(String token) {
         try {
+            log.info("검증할 토큰: {}", token);
+            log.info("시크릿키: {}", secret);
+            log.info("유저네임: {}", JWT.decode(token).getClaim(USERNAME_CLAIM).asString());
             JWT.require(Algorithm.HMAC512(secret)).build().verify(token);
             return true;
         } catch (Exception e) {

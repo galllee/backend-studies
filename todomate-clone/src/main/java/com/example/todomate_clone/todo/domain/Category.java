@@ -40,7 +40,8 @@ public class Category {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Category(String name, Visibility visibility, String color) {
+    public Category(Long userId, String name, Visibility visibility, String color) {
+        this.userId = userId;
         this.name = name;
         this.visibility = visibility;
         this.color = color;
