@@ -1,6 +1,7 @@
 package com.example.todomate_clone.global.exception;
 
 import com.example.todomate_clone.global.response.ApiResponse;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,4 +25,10 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.createError(e.getMessage()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<?>> handleIllegalArgumentException(IllegalArgumentException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.createError(e.getMessage()));
+    }
 }

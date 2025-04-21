@@ -54,7 +54,7 @@ public class Category {
         this.color = color;
     }
 
-    public void pauseCategory() {
+    public void completeCategory() {
         this.status = CategoryStatus.COMPLETED;
     }
 
