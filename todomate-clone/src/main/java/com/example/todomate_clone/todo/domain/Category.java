@@ -48,4 +48,17 @@ public class Category {
         this.status = CategoryStatus.IN_PROGRESS;
     }
 
+    public void updateCategory(String name, Visibility visibility, String color) {
+        this.name = name;
+        this.visibility = visibility;
+        this.color = color;
+    }
+
+    public void pauseCategory() {
+        this.status = CategoryStatus.COMPLETED;
+    }
+
+    public void resumeCategory() {
+        this.status = CategoryStatus.IN_PROGRESS;
+    }
 }
