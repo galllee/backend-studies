@@ -2,11 +2,17 @@ package com.example.todomate_clone.global.exception;
 
 import com.example.todomate_clone.global.response.ApiResponse;
 import org.apache.coyote.Response;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.naming.Binding;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,5 +36,12 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.createError(e.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException e) {
+        BindingResult bindingResult = e.getBindingResult();
+
+        return ResponseEntity.badRequest().body(ApiResponse.createFail(bindingResult));
     }
 }
