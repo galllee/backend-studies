@@ -2,6 +2,7 @@ package com.example.todomate_clone.todo.routine.service;
 
 import com.example.todomate_clone.todo.routine.domain.Routine;
 import com.example.todomate_clone.todo.routine.dto.request.CreateRoutineRequest;
+import com.example.todomate_clone.todo.routine.dto.request.UpdateRoutineRequest;
 import com.example.todomate_clone.todo.routine.repository.RoutineRepository;
 import com.example.todomate_clone.user.domain.User;
 import com.example.todomate_clone.user.repository.UserRepository;
@@ -35,4 +36,17 @@ public class RoutineService {
         );
     }
 
+    public void updateRoutine(Long routineId, UpdateRoutineRequest request) {
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 없습니다."));
+
+        routine.updateForm(request);
+    }
+
+    public void deleteRoutine(Long routineId) {
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 없습니다."));
+
+        routineRepository.delete(routine);
+    }
 }

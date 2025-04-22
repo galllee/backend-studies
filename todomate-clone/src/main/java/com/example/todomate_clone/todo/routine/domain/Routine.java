@@ -1,9 +1,11 @@
 package com.example.todomate_clone.todo.routine.domain;
 
+import com.example.todomate_clone.todo.routine.dto.request.UpdateRoutineRequest;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -62,5 +64,15 @@ public class Routine {
         this.frequencyDetailJson = frequencyDetailJson;
         this.time = time;
         this.isManual = isManual;
+    }
+
+    public void updateForm(UpdateRoutineRequest request) {
+        this.title = request.getTitle();
+        this.startDate = request.getStartDate();
+        this.endDate = request.getEndDate();
+        this.frequency = request.getFrequency();
+        this.frequencyDetailJson = request.getFrequencyDetailJson();
+        this.time = request.getTime();
+        this.isManual = request.getIsManual();
     }
 }
