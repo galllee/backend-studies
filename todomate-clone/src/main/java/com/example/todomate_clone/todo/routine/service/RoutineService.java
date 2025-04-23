@@ -1,9 +1,12 @@
 package com.example.todomate_clone.todo.routine.service;
 
+import com.example.todomate_clone.todo.routine.dto.request.CreateTodoFromManualRoutineRequest;
 import com.example.todomate_clone.todo.routine.domain.Routine;
 import com.example.todomate_clone.todo.routine.dto.request.CreateRoutineRequest;
 import com.example.todomate_clone.todo.routine.dto.request.UpdateRoutineRequest;
 import com.example.todomate_clone.todo.routine.repository.RoutineRepository;
+import com.example.todomate_clone.todo.todo.domain.Todo;
+import com.example.todomate_clone.todo.todo.repository.TodoRepository;
 import com.example.todomate_clone.user.domain.User;
 import com.example.todomate_clone.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class RoutineService {
     private final RoutineRepository routineRepository;
     private final UserRepository userRepository;
+    private final TodoRepository todoRepository;
 
     @Transactional
     public void createRoutine(String email, Long categoryId, CreateRoutineRequest request) {
@@ -34,6 +38,9 @@ public class RoutineService {
                         .isManual(request.getIsManual())
                         .build()
         );
+
+        if (!request.getIsManual()) {
+        }
     }
 
     public void updateRoutine(Long routineId, UpdateRoutineRequest request) {
@@ -48,5 +55,19 @@ public class RoutineService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 없습니다."));
 
         routineRepository.delete(routine);
+    }
+
+    public void createTodoFromManualRoutine(Long routineId, CreateTodoFromManualRoutineRequest request) {
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("루틴이 존재하지 않습니다."));
+
+        todoRepository.save(
+                Todo.builder()
+                        .categoryId(routine.getCategoryId())
+                        .userId(routine.getUserId())
+                        .title(routine.getTitle())
+                        .date(request.getDate())
+                        .build()
+        );
     }
 }
