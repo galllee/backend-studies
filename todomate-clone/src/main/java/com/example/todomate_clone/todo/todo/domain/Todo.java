@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -32,7 +33,7 @@ public class Todo {
 
     private String memo;
     private boolean isMemoPrivate;
-    private LocalDateTime reminderTime;
+    private LocalTime reminderTime;
     private Long elapsedTime;
 
     @CreatedDate
@@ -42,11 +43,12 @@ public class Todo {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Todo(Long categoryId, Long userId, String title, LocalDate date) {
+    public Todo(Long categoryId, Long userId, String title, LocalDate date, LocalTime reminderTime) {
         this.categoryId = categoryId;
         this.userId = userId;
         this.title = title;
         this.date = date;
+        this.reminderTime = reminderTime;
         this.status = TodoStatus.PENDING;
     }
 
@@ -59,7 +61,7 @@ public class Todo {
         this.isMemoPrivate = isMemoPrivate;
     }
 
-    public void updateTodoReminderTime(LocalDateTime reminderTime) {
+    public void updateTodoReminderTime(LocalTime reminderTime) {
         this.reminderTime = reminderTime;
     }
 

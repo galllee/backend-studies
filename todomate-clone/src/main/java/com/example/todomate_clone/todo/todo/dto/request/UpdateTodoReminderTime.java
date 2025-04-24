@@ -4,9 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor
 public class UpdateTodoReminderTime {
-    private LocalDateTime reminderTime;
+    private LocalTime reminderTime;
 }
