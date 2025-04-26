@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Year;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,7 @@ public class RoutineService {
         List<LocalDate> dates = new ArrayList<>();
 
         //자동이라면
-        if (request.getIsManual()) {
+        if (!request.getIsManual()) {
             int numOfDayBetween = (int) ChronoUnit.DAYS.between(request.getStartDate(), request.getEndDate());
             try {
                 switch (request.getFrequency()) {

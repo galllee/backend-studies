@@ -1,5 +1,6 @@
 package com.example.todomate_clone.todo.todo.service;
 
+import com.example.todomate_clone.global.response.ApiResponse;
 import com.example.todomate_clone.todo.todo.domain.Todo;
 import com.example.todomate_clone.todo.todo.repository.TodoRepository;
 import com.example.todomate_clone.todo.todo.dto.request.*;
@@ -7,7 +8,11 @@ import com.example.todomate_clone.user.domain.User;
 import com.example.todomate_clone.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 
@@ -103,4 +108,45 @@ public class TodoService {
 
         todo.updateDate(request.getNewDate());
     }
+
+    @Transactional
+    public void archiveTodo(Long todoId) {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
+
+        todo.archive();
+    }
+
+    @Transactional
+    public void repeatTodoToday(Long todoId) {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
+
+        todoRepository.save(
+                Todo.builder()
+                        .categoryId(todo.getCategoryId())
+                        .userId(todo.getUserId())
+                        .title(todo.getTitle())
+                        .date(LocalDate.now())
+                        .reminderTime(todo.getReminderTime())
+                .build()
+        );
+    }
+
+    @Transactional
+    public void repeatTodo(Long todoId, LocalDate date) {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
+
+        todoRepository.save(
+                Todo.builder()
+                        .categoryId(todo.getCategoryId())
+                        .userId(todo.getUserId())
+                        .title(todo.getTitle())
+                        .date(date)
+                        .reminderTime(todo.getReminderTime())
+                        .build()
+        );
+    }
+
 }

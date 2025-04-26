@@ -3,12 +3,15 @@ package com.example.todomate_clone.todo.todo.controller;
 import com.example.todomate_clone.global.security.jwt.service.JwtService;
 import com.example.todomate_clone.global.util.AuthUtil;
 import com.example.todomate_clone.global.response.ApiResponse;
+import com.example.todomate_clone.todo.category.dto.request.RepeatTodoRequest;
 import com.example.todomate_clone.todo.todo.service.TodoService;
 import com.example.todomate_clone.todo.todo.dto.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @RestController
@@ -84,6 +87,7 @@ public class TodoController {
     // do today
     @PatchMapping("/api/v1/todos/{todoId}/schedule/today")
     public ResponseEntity<ApiResponse<?>> scheduleTodoForToday(@PathVariable Long todoId) {
+        AuthUtil.validateUser();
         todoService.scheduleTodoForToday(todoId);
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("오늘로 일정 이동 완료"));
@@ -92,6 +96,7 @@ public class TodoController {
     // do tomorrow
     @PatchMapping("/api/v1/todos/{todoId}/schedule/tomorrow")
     public ResponseEntity<ApiResponse<?>> scheduleTodoForTomorrow(@PathVariable Long todoId) {
+        AuthUtil.validateUser();
         todoService.scheduleTodoForTomorrow(todoId);
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("내일로 일정 이동 완료"));
@@ -100,8 +105,38 @@ public class TodoController {
     // change date
     @PatchMapping("/api/v1/todos/{todoId}/schedule")
     public ResponseEntity<ApiResponse<?>> updateTodoSchedule(@PathVariable Long todoId, @RequestBody UpdateTodoScheduleRequest request) {
+        AuthUtil.validateUser();
         todoService.updateTodoSchedule(todoId, request);
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("일정 이동 완료"));
     }
+
+    // archive
+    @PatchMapping("/api/v1/todos/{todoId}/archive")
+    public ResponseEntity<ApiResponse<?>> archiveTodo(@PathVariable Long todoId) {
+        AuthUtil.validateUser();
+        todoService.archiveTodo(todoId);
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("보관함으로 이동 완료"));
+    }
+
+    // do it again
+    @PostMapping("/api/v1/todos/{todoId}/repeat-today")
+    public ResponseEntity<ApiResponse<?>> repeatTodoToday(@PathVariable Long todoId) {
+        AuthUtil.validateUser();
+        todoService.repeatTodoToday(todoId);
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("오늘 또하기 완료"));
+    }
+
+    @PostMapping("/api/v1/todos/{todoId}/repeat")
+    public ResponseEntity<ApiResponse<?>> repeatTodo(
+            @PathVariable Long todoId,
+            @RequestBody RepeatTodoRequest request) {
+        AuthUtil.validateUser();
+        todoService.repeatTodo(todoId, request.getDate());
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("다른 날 또하기 완료"));
+    }
+
 }

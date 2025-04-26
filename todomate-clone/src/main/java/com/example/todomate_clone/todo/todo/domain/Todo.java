@@ -35,6 +35,7 @@ public class Todo {
     private boolean isMemoPrivate;
     private LocalTime reminderTime;
     private Long elapsedTime;
+    private boolean isArchived;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -50,6 +51,7 @@ public class Todo {
         this.date = date;
         this.reminderTime = reminderTime;
         this.status = TodoStatus.PENDING;
+        this.isArchived = false;
     }
 
     public void editTodo(String title) {
@@ -75,5 +77,9 @@ public class Todo {
 
     public void updateDate(LocalDate date) {
         this.date = date;
+    }
+
+    public void archive() {
+        this.isArchived = true;
     }
 }
