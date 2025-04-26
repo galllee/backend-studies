@@ -4,6 +4,7 @@ import com.example.todomate_clone.global.security.jwt.service.JwtService;
 import com.example.todomate_clone.global.util.AuthUtil;
 import com.example.todomate_clone.global.response.ApiResponse;
 import com.example.todomate_clone.todo.category.dto.request.RepeatTodoRequest;
+import com.example.todomate_clone.todo.todo.dto.response.TodoGroupByCategoryResponse;
 import com.example.todomate_clone.todo.todo.service.TodoService;
 import com.example.todomate_clone.todo.todo.dto.request.*;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -139,4 +141,12 @@ public class TodoController {
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("다른 날 또하기 완료"));
     }
 
+    @GetMapping("/api/v1/todos")
+    public ResponseEntity<ApiResponse<?>> getTodosByDate(
+            @RequestParam LocalDate date
+            ) {
+        List<TodoGroupByCategoryResponse> todoResponses = todoService.getTodosByDateGroupedByCategory(AuthUtil.getLoginUsername(), date);
+
+        return ResponseEntity.ok(ApiResponse.createSuccess("투두 보여주기 완료", todoResponses));
+    }
 }

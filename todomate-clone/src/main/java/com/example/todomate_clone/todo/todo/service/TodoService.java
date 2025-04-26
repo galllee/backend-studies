@@ -1,26 +1,28 @@
 package com.example.todomate_clone.todo.todo.service;
 
-import com.example.todomate_clone.global.response.ApiResponse;
+import com.example.todomate_clone.todo.category.domain.Category;
+import com.example.todomate_clone.todo.category.repository.CategoryRepository;
 import com.example.todomate_clone.todo.todo.domain.Todo;
+import com.example.todomate_clone.todo.todo.dto.response.TodoGroupByCategoryResponse;
 import com.example.todomate_clone.todo.todo.repository.TodoRepository;
 import com.example.todomate_clone.todo.todo.dto.request.*;
 import com.example.todomate_clone.user.domain.User;
 import com.example.todomate_clone.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class TodoService {
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
     public void createTodo(Long categoryId, CreateTodoRequest request, String email) {
         User user = userRepository.findByEmail(email)
@@ -149,4 +151,30 @@ public class TodoService {
         );
     }
 
+    public List<TodoGroupByCategoryResponse> getTodosByDateGroupedByCategory(String email, LocalDate date) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        Map<Long, List<Todo>> todosByCategory = todoRepository.findAllByUserIdAndDate(user.getId(), date)
+                .stream().collect(Collectors.groupingBy(Todo::getCategoryId));
+
+        return todosByCategory.entrySet().stream().flatMap(
+                entry -> {
+                    Category category = categoryRepository.findById(entry.getKey())
+                                    .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
+
+                    return entry.getValue().stream().map(todo -> TodoGroupByCategoryResponse.builder()
+                            .categoryName(category.getName())
+                            .title(todo.getTitle())
+                            .elapsedTime(todo.getElapsedTime())
+                            .memo(todo.getMemo())
+                            .status(todo.getStatus())
+                            .build()
+                    );
+                }).toList();
+
+        // 미완료 -> 완료 -> 수동루틴 연하게 보여주는 순서
+
+
+    }
 }
