@@ -36,6 +36,7 @@ public class Todo {
     private LocalTime reminderTime;
     private Long elapsedTime;
     private boolean isArchived;
+    private Long orderNum;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -81,5 +82,13 @@ public class Todo {
 
     public void archive() {
         this.isArchived = true;
+    }
+
+    public void updateOrderNum(Long orderNum) {
+        this.orderNum = orderNum;
+    }
+
+    public void updateCategory(Long categoryNum) {
+        this.categoryId = categoryNum;
     }
 }

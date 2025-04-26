@@ -4,6 +4,7 @@ import com.example.todomate_clone.global.security.jwt.service.JwtService;
 import com.example.todomate_clone.global.util.AuthUtil;
 import com.example.todomate_clone.global.response.ApiResponse;
 import com.example.todomate_clone.todo.category.dto.request.RepeatTodoRequest;
+import com.example.todomate_clone.todo.category.dto.request.UpdateTodoOrdersRequest;
 import com.example.todomate_clone.todo.todo.dto.response.TodoGroupByCategoryResponse;
 import com.example.todomate_clone.todo.todo.service.TodoService;
 import com.example.todomate_clone.todo.todo.dto.request.*;
@@ -148,5 +149,12 @@ public class TodoController {
         List<TodoGroupByCategoryResponse> todoResponses = todoService.getTodosByDateGroupedByCategory(AuthUtil.getLoginUsername(), date);
 
         return ResponseEntity.ok(ApiResponse.createSuccess("투두 보여주기 완료", todoResponses));
+    }
+
+    @PatchMapping("/api/v1/todos/order")
+    public ResponseEntity<ApiResponse<?>> updateTodoOrders(@RequestBody UpdateTodoOrdersRequest request) {
+        todoService.updateTodoOrders(AuthUtil.getLoginUsername(), request);
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("투두 순서 변경 완료"));
     }
 }

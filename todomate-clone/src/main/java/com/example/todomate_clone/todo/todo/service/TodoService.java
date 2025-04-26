@@ -1,6 +1,8 @@
 package com.example.todomate_clone.todo.todo.service;
 
 import com.example.todomate_clone.todo.category.domain.Category;
+import com.example.todomate_clone.todo.category.dto.request.TodoOrderItem;
+import com.example.todomate_clone.todo.category.dto.request.UpdateTodoOrdersRequest;
 import com.example.todomate_clone.todo.category.repository.CategoryRepository;
 import com.example.todomate_clone.todo.todo.domain.Todo;
 import com.example.todomate_clone.todo.todo.dto.response.TodoGroupByCategoryResponse;
@@ -176,5 +178,24 @@ public class TodoService {
         // 미완료 -> 완료 -> 수동루틴 연하게 보여주는 순서
 
 
+    }
+
+    @Transactional
+    public void updateTodoOrders(String email, UpdateTodoOrdersRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+
+        List<Todo> todos = todoRepository.findAllByUserIdAndDate(user.getId(), request.getDate());
+
+        for(Todo todo : todos) {
+            TodoOrderItem matched = request.getOrderItems()
+                            .stream().filter(
+                                    orderItem -> todo.getId().equals(orderItem.getTodoId())
+                    ).findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("해당 todo가 존재하지 않습니다."));
+
+            todo.updateOrderNum(matched.getOrderNum());
+            todo.updateCategory(matched.getCategoryId());
+        }
     }
 }
