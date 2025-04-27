@@ -72,6 +72,10 @@ public class Todo {
         this.elapsedTime = elapsedTime;
     }
 
+    public void resetElapsedTime() {
+        this.elapsedTime = 0L;
+    }
+
     public void markAsCompleted() {
         this.status = TodoStatus.COMPLETED;
     }

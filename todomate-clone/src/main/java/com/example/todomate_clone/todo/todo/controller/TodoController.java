@@ -87,6 +87,14 @@ public class TodoController {
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("타이머 시간 저장 및 투두 완료"));
     }
 
+    @PatchMapping("/api/v1/todos/{todoId}/timer/reset")
+    public ResponseEntity<ApiResponse<?>> resetTodoTimer(@PathVariable Long todoId) {
+        AuthUtil.validateUser();
+        todoService.resetTodoTimer(todoId);
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("타이머 시간 초기화 완료"));
+    }
+
     // do today
     @PatchMapping("/api/v1/todos/{todoId}/schedule/today")
     public ResponseEntity<ApiResponse<?>> scheduleTodoForToday(@PathVariable Long todoId) {

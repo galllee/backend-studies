@@ -91,6 +91,14 @@ public class TodoService {
     }
 
     @Transactional
+    public void resetTodoTimer(Long todoId) {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() ->new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
+
+        todo.resetElapsedTime();
+    }
+
+    @Transactional
     public void scheduleTodoForToday(Long todoId) {
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() ->new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
