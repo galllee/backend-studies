@@ -12,9 +12,11 @@ import com.example.todomate_clone.user.domain.User;
 import com.example.todomate_clone.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -154,10 +156,11 @@ public class TodoService {
     }
 
     public List<TodoGroupByCategoryResponse> getTodosByDateGroupedByCategory(String email, LocalDate date) {
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
-        Map<Long, List<Todo>> todosByCategory = todoRepository.findAllByUserIdAndDate(user.getId(), date)
+        Map<Long, List<Todo>> todosByCategory = todoRepository.findAllByUserIdAndDateAndIsArchivedFalse(user.getId(), date)
                 .stream().collect(Collectors.groupingBy(Todo::getCategoryId));
 
         return todosByCategory.entrySet().stream().flatMap(
@@ -165,7 +168,34 @@ public class TodoService {
                     Category category = categoryRepository.findById(entry.getKey())
                                     .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
 
-                    return entry.getValue().stream().map(todo -> TodoGroupByCategoryResponse.builder()
+                    List<Todo> todos = entry.getValue();
+
+                    Comparator<Todo> nullFirstComparator = (t1, t2) -> {
+                        boolean isT1Null = t1.getOrderNum() == null;
+                        boolean isT2Null = t2.getOrderNum() == null;
+
+                        if (isT1Null && !isT2Null) {
+                            return -1;
+                        } else if (!isT1Null && isT2Null) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    };
+
+                    Comparator<Todo> detailComparator = (t1, t2) -> {
+                        if (t1.getOrderNum() == null && t2.getOrderNum() == null) {
+                            return t2.getCreatedAt().compareTo(t1.getCreatedAt());
+                        } else {
+                            return t1.getOrderNum().compareTo(t2.getOrderNum());
+                        }
+                    };
+
+                    List<Todo> sortedTodo = todos.stream()
+                            .sorted(nullFirstComparator.thenComparing(detailComparator))
+                            .toList();
+
+                    return sortedTodo.stream().map(todo -> TodoGroupByCategoryResponse.builder()
                             .categoryName(category.getName())
                             .title(todo.getTitle())
                             .elapsedTime(todo.getElapsedTime())
@@ -174,10 +204,6 @@ public class TodoService {
                             .build()
                     );
                 }).toList();
-
-        // 미완료 -> 완료 -> 수동루틴 연하게 보여주는 순서
-
-
     }
 
     @Transactional
@@ -185,7 +211,7 @@ public class TodoService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
-        List<Todo> todos = todoRepository.findAllByUserIdAndDate(user.getId(), request.getDate());
+        List<Todo> todos = todoRepository.findAllByUserIdAndDateAndIsArchivedFalse(user.getId(), request.getDate());
 
         for(Todo todo : todos) {
             TodoOrderItem matched = request.getOrderItems()

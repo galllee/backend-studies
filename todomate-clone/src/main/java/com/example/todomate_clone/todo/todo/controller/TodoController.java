@@ -129,7 +129,8 @@ public class TodoController {
         AuthUtil.validateUser();
         todoService.repeatTodoToday(todoId);
 
-        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("오늘 또하기 완료"));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.createSuccessWithNoContent("오늘 또하기 완료"));
     }
 
     @PostMapping("/api/v1/todos/{todoId}/repeat")
@@ -139,7 +140,8 @@ public class TodoController {
         AuthUtil.validateUser();
         todoService.repeatTodo(todoId, request.getDate());
 
-        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("다른 날 또하기 완료"));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.createSuccessWithNoContent("다른 날 또하기 완료"));
     }
 
     @GetMapping("/api/v1/todos")
