@@ -1,7 +1,7 @@
 package com.example.todomate_clone.todo.todo.service;
 
 import com.example.todomate_clone.todo.category.domain.Category;
-import com.example.todomate_clone.todo.category.dto.request.TodoOrderItem;
+import com.example.todomate_clone.todo.todo.dto.request.TodoOrderItem;
 import com.example.todomate_clone.todo.category.dto.request.UpdateTodoOrdersRequest;
 import com.example.todomate_clone.todo.category.repository.CategoryRepository;
 import com.example.todomate_clone.todo.todo.domain.Todo;
@@ -12,7 +12,6 @@ import com.example.todomate_clone.user.domain.User;
 import com.example.todomate_clone.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -163,7 +162,18 @@ public class TodoService {
         Map<Long, List<Todo>> todosByCategory = todoRepository.findAllByUserIdAndDateAndIsArchivedFalse(user.getId(), date)
                 .stream().collect(Collectors.groupingBy(Todo::getCategoryId));
 
-        return todosByCategory.entrySet().stream().flatMap(
+        return todosByCategory.entrySet().stream()
+                .sorted(Comparator.comparing((Map.Entry<Long, List<Todo>> entry) -> {
+                    Category category = categoryRepository.findById(entry.getKey())
+                            .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
+                    Long orderNum = category.getOrderNum();
+                    return orderNum == null ? Integer.MAX_VALUE : orderNum;
+                }).thenComparing(entry -> {
+                    Category category = categoryRepository.findById(entry.getKey())
+                            .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
+                    return category.getCreatedAt();
+                }))
+                .flatMap(
                 entry -> {
                     Category category = categoryRepository.findById(entry.getKey())
                                     .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));

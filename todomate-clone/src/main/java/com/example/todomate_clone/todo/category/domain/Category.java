@@ -32,6 +32,8 @@ public class Category {
 
     private String color;
 
+    private Long orderNum;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -59,5 +61,9 @@ public class Category {
 
     public void resumeCategory() {
         this.status = CategoryStatus.IN_PROGRESS;
+    }
+
+    public void updateOrderNum(Long orderNum) {
+        this.orderNum = orderNum;
     }
 }

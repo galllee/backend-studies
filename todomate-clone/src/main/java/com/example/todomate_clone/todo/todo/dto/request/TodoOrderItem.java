@@ -1,4 +1,4 @@
-package com.example.todomate_clone.todo.category.dto.request;
+package com.example.todomate_clone.todo.todo.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

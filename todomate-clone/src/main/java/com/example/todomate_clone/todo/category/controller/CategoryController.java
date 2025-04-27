@@ -5,6 +5,7 @@ import com.example.todomate_clone.global.util.AuthUtil;
 import com.example.todomate_clone.todo.category.dto.request.CreateCategoryRequest;
 import com.example.todomate_clone.todo.category.dto.request.EditCategoryRequest;
 import com.example.todomate_clone.todo.category.service.CategoryService;
+import com.example.todomate_clone.todo.category.dto.request.UpdateCategoryOrdersRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +59,12 @@ public class CategoryController {
         categoryService.deleteCategory(categoryId);
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("카테고리 삭제 완료"));
+    }
+
+    @PatchMapping("/api/v1/categories/order")
+    public ResponseEntity<ApiResponse<?>> updateCategoryOrders(@RequestBody UpdateCategoryOrdersRequest request) {
+        categoryService.updateCategoryOrders(AuthUtil.getLoginUsername(), request);
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("카테고리 순서 변경 완료"));
     }
 }
