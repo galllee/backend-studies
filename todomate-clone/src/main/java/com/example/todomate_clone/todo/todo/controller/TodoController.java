@@ -167,4 +167,24 @@ public class TodoController {
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("투두 순서 변경 완료"));
     }
+
+    @PostMapping("/api/v1/todos/{toodId}/likes")
+    public ResponseEntity<ApiResponse<?>> likeTodo(
+            @PathVariable Long todoId
+    ) {
+        todoService.likeTodo(AuthUtil.getLoginUsername(), todoId);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.createSuccessWithNoContent("좋아요 생성 완료"));
+    }
+
+    @DeleteMapping("/api/v1/todos/likes/{todoLikeId}")
+    public ResponseEntity<ApiResponse<?>> unlikeTodo(
+            @PathVariable Long todoLikeId
+    ) {
+        AuthUtil.validateUser();
+        todoService.unlikeTodo(todoLikeId);
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("좋아요 삭제 완료"));
+    }
 }

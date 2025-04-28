@@ -18,7 +18,7 @@ import java.io.IOException;
 public class FirebaseCloudMessageController {
     private final FirebaseCloudMessageService firebaseCloudMessageService;
 
-    @PostMapping("/api/fcm")
+    @PostMapping("/api/v1/fcm")
     public ResponseEntity<ApiResponse<?>> pushMessage(@RequestBody TestAlarmRequest request) throws IOException {
         System.out.println(request.getTargetToken() + " " + request.getTitle() + " " + request.getBody());
         firebaseCloudMessageService.sendMessageTo(

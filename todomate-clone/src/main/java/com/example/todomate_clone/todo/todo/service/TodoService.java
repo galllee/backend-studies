@@ -1,5 +1,7 @@
 package com.example.todomate_clone.todo.todo.service;
 
+import com.example.todomate_clone.friend.domain.TodoLike;
+import com.example.todomate_clone.friend.repository.TodoLikeRepository;
 import com.example.todomate_clone.todo.category.domain.Category;
 import com.example.todomate_clone.todo.todo.dto.request.TodoOrderItem;
 import com.example.todomate_clone.todo.category.dto.request.UpdateTodoOrdersRequest;
@@ -26,6 +28,7 @@ public class TodoService {
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final TodoLikeRepository todoLikeRepository;
 
     public void createTodo(Long categoryId, CreateTodoRequest request, String email) {
         User user = userRepository.findByEmail(email)
@@ -241,5 +244,20 @@ public class TodoService {
             todo.updateOrderNum(matched.getOrderNum());
             todo.updateCategory(matched.getCategoryId());
         }
+    }
+
+    @Transactional
+    public void likeTodo(String email, Long todoId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+
+        todoLikeRepository.save(
+                new TodoLike(user.getId(), todoId)
+        );
+    }
+
+    @Transactional
+    public void unlikeTodo(Long todoLikeId) {
+        todoLikeRepository.deleteById(todoLikeId);
     }
 }
