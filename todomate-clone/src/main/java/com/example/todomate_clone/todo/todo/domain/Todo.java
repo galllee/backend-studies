@@ -34,6 +34,7 @@ public class Todo {
     private String memo;
     private boolean isMemoPrivate;
     private LocalTime reminderTime;
+    private boolean reminderSent;
     private Long elapsedTime;
     private boolean isArchived;
     private Long orderNum;
@@ -51,6 +52,7 @@ public class Todo {
         this.title = title;
         this.date = date;
         this.reminderTime = reminderTime;
+        this.reminderSent = false;
         this.status = TodoStatus.PENDING;
         this.isArchived = false;
     }
@@ -94,5 +96,9 @@ public class Todo {
 
     public void updateCategory(Long categoryNum) {
         this.categoryId = categoryNum;
+    }
+
+    public void markReminderSent() {
+        this.reminderSent = true;
     }
 }
