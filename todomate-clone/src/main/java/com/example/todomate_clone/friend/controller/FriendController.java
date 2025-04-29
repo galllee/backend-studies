@@ -7,6 +7,7 @@ import com.example.todomate_clone.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,5 +28,12 @@ public class FriendController {
                 .body(ApiResponse.createSuccessWithNoContent("팔로우 완료"));
     }
 
+    @DeleteMapping("/api/v1/friends/{toUserId}")
+    public ResponseEntity<ApiResponse<?>> unfollow(
+            @PathVariable Long toUserId
+    ) {
+        friendService.unfollow(AuthUtil.getLoginUsername(), toUserId);
 
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("팔로우 완료"));
+    }
 }

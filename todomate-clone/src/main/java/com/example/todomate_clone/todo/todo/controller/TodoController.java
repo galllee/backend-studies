@@ -152,7 +152,7 @@ public class TodoController {
                 .body(ApiResponse.createSuccessWithNoContent("다른 날 또하기 완료"));
     }
 
-    @GetMapping("/api/v1/todos")
+    @GetMapping("/api/v1/todos/me")
     public ResponseEntity<ApiResponse<?>> getTodosByDate(
             @RequestParam LocalDate date
             ) {
@@ -187,4 +187,7 @@ public class TodoController {
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("좋아요 삭제 완료"));
     }
+
+
+
 }

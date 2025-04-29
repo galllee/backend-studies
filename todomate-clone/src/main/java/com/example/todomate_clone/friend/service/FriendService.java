@@ -19,14 +19,25 @@ public class FriendService {
 
     @Transactional
     public void follow(String fromUserName, Long toUserId) {
-        User user = userRepository.findByEmail(fromUserName)
+        User fromUser = userRepository.findByEmail(fromUserName)
                         .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
 
         friendRepository.save(
-                new Friend(user.getId(), toUserId)
+                new Friend(fromUser.getId(), toUserId)
         );
     }
 
+    @Transactional
+    public void unfollow(String fromUserName, Long toUserId) {
+        User fromUser = userRepository.findByEmail(fromUserName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
+
+        Friend friend = friendRepository.findByFromUserIdAndToUserId(
+                fromUser.getId(), toUserId
+        ).orElseThrow(() -> new IllegalArgumentException("해당 팔로우 목록이 없습니다."));
+
+        friendRepository.delete(friend);
+    }
 
 
 }
