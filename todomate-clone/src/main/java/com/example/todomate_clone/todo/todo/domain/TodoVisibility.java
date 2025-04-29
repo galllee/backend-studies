@@ -1,5 +1,6 @@
 package com.example.todomate_clone.todo.todo.domain;
 
+import com.example.todomate_clone.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,14 +18,19 @@ public class TodoVisibility {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long todoId;
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "todo_id", nullable = false)
+    private Todo todo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public TodoVisibility(Long todoId, Long userId) {
-        this.todoId = todoId;
-        this.userId = userId;
+    public TodoVisibility(Todo todo, User user) {
+        this.todo = todo;
+        this.user = user;
     }
 }

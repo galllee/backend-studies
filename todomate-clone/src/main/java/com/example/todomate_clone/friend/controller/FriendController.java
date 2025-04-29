@@ -22,7 +22,7 @@ public class FriendController {
     public ResponseEntity<ApiResponse<?>> follow(
             @PathVariable Long toUserId
     ) {
-        friendService.follow(AuthUtil.getLoginUsername(), toUserId);
+        friendService.follow(AuthUtil.getLoginUserId(), toUserId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.createSuccessWithNoContent("팔로우 완료"));
@@ -32,7 +32,7 @@ public class FriendController {
     public ResponseEntity<ApiResponse<?>> unfollow(
             @PathVariable Long toUserId
     ) {
-        friendService.unfollow(AuthUtil.getLoginUsername(), toUserId);
+        friendService.unfollow(AuthUtil.getLoginUserId(), toUserId);
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("팔로우 완료"));
     }

@@ -30,7 +30,7 @@ public class AlarmScheduler {
         List<Todo> todos = todoRepository.findAllByReminderTimeLessThanEqualAndReminderSentFalse(LocalTime.now());
 
         for(Todo todo : todos) {
-            List<DeviceToken> tokens = deviceTokenRepository.findAllByUserId(todo.getUserId());
+            List<DeviceToken> tokens = deviceTokenRepository.findAllByUser(todo.getUser());
             List<String> tokenStrings = tokens.stream()
                     .map(DeviceToken::getDeviceToken)
                     .collect(Collectors.toList());

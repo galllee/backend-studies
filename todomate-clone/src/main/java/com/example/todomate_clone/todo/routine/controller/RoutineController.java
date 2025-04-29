@@ -20,7 +20,7 @@ public class RoutineController {
 
     @PostMapping("/api/v1/categories/{categoryId}/routines")
     public ResponseEntity<ApiResponse<?>> createRoutine(@PathVariable Long categoryId, @Valid @RequestBody CreateRoutineRequest request) {
-        routineService.createRoutine(AuthUtil.getLoginUsername(), categoryId, request);
+        routineService.createRoutine(AuthUtil.getLoginUserId(), categoryId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.createSuccessWithNoContent("루틴 생성 완료"));

@@ -1,5 +1,6 @@
 package com.example.todomate_clone.todo.category.domain;
 
+import com.example.todomate_clone.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,9 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private String name;
@@ -41,8 +44,8 @@ public class Category {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Category(Long userId, String name, Visibility visibility, String color) {
-        this.userId = userId;
+    public Category(User user, String name, Visibility visibility, String color) {
+        this.user = user;
         this.name = name;
         this.visibility = visibility;
         this.color = color;

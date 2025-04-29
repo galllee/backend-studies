@@ -26,7 +26,7 @@ public class TodoController {
     // create todo
     @PostMapping("/api/v1/categories/{categoryId}/todos")
     public ResponseEntity<ApiResponse<?>> createTodo(@PathVariable Long categoryId, @RequestBody CreateTodoRequest request) {
-        todoService.createTodo(categoryId, request, AuthUtil.getLoginUsername());
+        todoService.createTodo(AuthUtil.getLoginUserId(), categoryId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.createSuccessWithNoContent("투두 생성 완료"));
@@ -152,18 +152,19 @@ public class TodoController {
                 .body(ApiResponse.createSuccessWithNoContent("다른 날 또하기 완료"));
     }
 
-    @GetMapping("/api/v1/todos/me")
+    @GetMapping("/api/v1/todos/{toUserId}")
     public ResponseEntity<ApiResponse<?>> getTodosByDate(
+            @PathVariable Long toUserId,
             @RequestParam LocalDate date
             ) {
-        List<TodoGroupByCategoryResponse> todoResponses = todoService.getTodosByDateGroupedByCategory(AuthUtil.getLoginUsername(), date);
+        List<TodoGroupByCategoryResponse> todoResponses = todoService.getTodosByDateGroupedByCategory(AuthUtil.getLoginUserId(), toUserId, date);
 
         return ResponseEntity.ok(ApiResponse.createSuccess("투두 보여주기 완료", todoResponses));
     }
 
     @PatchMapping("/api/v1/todos/order")
     public ResponseEntity<ApiResponse<?>> updateTodoOrders(@RequestBody UpdateTodoOrdersRequest request) {
-        todoService.updateTodoOrders(AuthUtil.getLoginUsername(), request);
+        todoService.updateTodoOrders(AuthUtil.getLoginUserId(), request);
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("투두 순서 변경 완료"));
     }
@@ -172,7 +173,7 @@ public class TodoController {
     public ResponseEntity<ApiResponse<?>> likeTodo(
             @PathVariable Long todoId
     ) {
-        todoService.likeTodo(AuthUtil.getLoginUsername(), todoId);
+        todoService.likeTodo(AuthUtil.getLoginUserId(), todoId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.createSuccessWithNoContent("좋아요 생성 완료"));
@@ -187,7 +188,5 @@ public class TodoController {
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("좋아요 삭제 완료"));
     }
-
-
 
 }

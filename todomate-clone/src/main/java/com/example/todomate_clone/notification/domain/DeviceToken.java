@@ -1,5 +1,6 @@
 package com.example.todomate_clone.notification.domain;
 
+import com.example.todomate_clone.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,9 @@ public class DeviceToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private String deviceToken;
@@ -30,8 +33,8 @@ public class DeviceToken {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public DeviceToken(Long userId, String deviceToken) {
-        this.userId = userId;
+    public DeviceToken(User user, String deviceToken) {
+        this.user = user;
         this.deviceToken = deviceToken;
     }
 }

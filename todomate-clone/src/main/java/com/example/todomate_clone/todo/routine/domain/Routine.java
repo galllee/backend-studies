@@ -1,6 +1,8 @@
 package com.example.todomate_clone.todo.routine.domain;
 
+import com.example.todomate_clone.todo.category.domain.Category;
 import com.example.todomate_clone.todo.routine.dto.request.UpdateRoutineRequest;
+import com.example.todomate_clone.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,11 +25,13 @@ public class Routine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(nullable = false)
-    private Long categoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(nullable = false)
     private String title;
@@ -51,12 +55,12 @@ public class Routine {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Routine(Long userId, Long categoryId, String title,
+    public Routine(User user, Category category, String title,
                    LocalDate startDate, LocalDate endDate,
                    Frequency frequency, String frequencyDetailJson,
                    LocalTime time, boolean isManual) {
-        this.userId = userId;
-        this.categoryId = categoryId;
+        this.user = user;
+        this.category = category;
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;

@@ -1,5 +1,7 @@
 package com.example.todomate_clone.friend.domain;
 
+import com.example.todomate_clone.todo.todo.domain.Todo;
+import com.example.todomate_clone.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +19,19 @@ public class TodoLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
-    private Long todoId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "todo_id", nullable = false)
+    private Todo todo;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public TodoLike(Long userId, Long todoId) {
-        this.userId = userId;
-        this.todoId = todoId;
+    public TodoLike(User user, Todo todo) {
+        this.user = user;
+        this.todo = todo;
     }
 }

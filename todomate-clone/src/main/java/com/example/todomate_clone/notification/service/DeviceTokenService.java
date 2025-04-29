@@ -16,12 +16,12 @@ public class DeviceTokenService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void registerDeviceToken(String email, RegisterDeviceTokenRequest request) {
-        User user = userRepository.findByEmail(email)
+    public void registerDeviceToken(Long id, RegisterDeviceTokenRequest request) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
 
         deviceTokenRepository.save(
-                new DeviceToken(user.getId(), request.getDeviceToken())
+                new DeviceToken(user, request.getDeviceToken())
         );
     }
 

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +31,16 @@ public class TodoService {
     private final CategoryRepository categoryRepository;
     private final TodoLikeRepository todoLikeRepository;
 
-    public void createTodo(Long categoryId, CreateTodoRequest request, String email) {
-        User user = userRepository.findByEmail(email)
+    public void createTodo(Long userId, Long categoryId, CreateTodoRequest request) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
 
+        Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾을 수 없습니다."));
         todoRepository.save(
                 Todo.builder()
-                        .categoryId(categoryId)
-                        .userId(user.getId())
+                        .category(category)
+                        .user(user)
                         .title(request.getTitle())
                         .date(request.getDate())
                         .build()
@@ -139,13 +142,7 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
         todoRepository.save(
-                Todo.builder()
-                        .categoryId(todo.getCategoryId())
-                        .userId(todo.getUserId())
-                        .title(todo.getTitle())
-                        .date(LocalDate.now())
-                        .reminderTime(todo.getReminderTime())
-                .build()
+                todo.repeatForDate(LocalDate.now())
         );
     }
 
@@ -155,38 +152,34 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
         todoRepository.save(
-                Todo.builder()
-                        .categoryId(todo.getCategoryId())
-                        .userId(todo.getUserId())
-                        .title(todo.getTitle())
-                        .date(date)
-                        .reminderTime(todo.getReminderTime())
-                        .build()
+                todo.repeatForDate(date)
         );
     }
 
-    public List<TodoGroupByCategoryResponse> getTodosByDateGroupedByCategory(String email, LocalDate date) {
-
-        User user = userRepository.findByEmail(email)
+    public List<TodoGroupByCategoryResponse> getTodosByDateGroupedByCategory(Long fromUserId, Long toUserId, LocalDate date) {
+        User fromUser = userRepository.findById(fromUserId)
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
-        Map<Long, List<Todo>> todosByCategory = todoRepository.findAllByUserIdAndDateAndIsArchivedFalse(user.getId(), date)
-                .stream().collect(Collectors.groupingBy(Todo::getCategoryId));
+        User toUser = userRepository.findById(toUserId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        Map<Category, List<Todo>> todosByCategory = todoRepository.findVisibleTodos(fromUserId, toUserId, date)
+                .stream().collect(Collectors.groupingBy(Todo::getCategory));
 
         return todosByCategory.entrySet().stream()
-                .sorted(Comparator.comparing((Map.Entry<Long, List<Todo>> entry) -> {
-                    Category category = categoryRepository.findById(entry.getKey())
+                .sorted(Comparator.comparing((Map.Entry<Category, List<Todo>> entry) -> {
+                    Category category = categoryRepository.findById(entry.getKey().getId())
                             .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
                     Long orderNum = category.getOrderNum();
                     return orderNum == null ? Integer.MAX_VALUE : orderNum;
                 }).thenComparing(entry -> {
-                    Category category = categoryRepository.findById(entry.getKey())
+                    Category category = categoryRepository.findById(entry.getKey().getId())
                             .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
                     return category.getCreatedAt();
                 }))
                 .flatMap(
                 entry -> {
-                    Category category = categoryRepository.findById(entry.getKey())
+                    Category category = categoryRepository.findById(entry.getKey().getId())
                                     .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
 
                     List<Todo> todos = entry.getValue();
@@ -228,11 +221,11 @@ public class TodoService {
     }
 
     @Transactional
-    public void updateTodoOrders(String email, UpdateTodoOrdersRequest request) {
-        User user = userRepository.findByEmail(email)
+    public void updateTodoOrders(Long userId, UpdateTodoOrdersRequest request) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
-        List<Todo> todos = todoRepository.findAllByUserIdAndDateAndIsArchivedFalse(user.getId(), request.getDate());
+        List<Todo> todos = todoRepository.findAllByUserAndDateAndIsArchivedFalse(user, request.getDate());
 
         for(Todo todo : todos) {
             TodoOrderItem matched = request.getOrderItems()
@@ -242,17 +235,25 @@ public class TodoService {
                     .orElseThrow(() -> new IllegalArgumentException("해당 todo가 존재하지 않습니다."));
 
             todo.updateOrderNum(matched.getOrderNum());
-            todo.updateCategory(matched.getCategoryId());
+
+            Category category = categoryRepository.findById(matched.getCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾을 수 없습니다."));
+            // for문 전에 카테고리 한번에 조회해놓는 것도 좋을듯
+
+            todo.updateCategory(category);
         }
     }
 
     @Transactional
-    public void likeTodo(String email, Long todoId) {
-        User user = userRepository.findByEmail(email)
+    public void likeTodo(Long userId, Long todoId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두가 존재하지 않습니다."));
+
         todoLikeRepository.save(
-                new TodoLike(user.getId(), todoId)
+                new TodoLike(user, todo)
         );
     }
 
@@ -261,5 +262,13 @@ public class TodoService {
         todoLikeRepository.deleteById(todoLikeId);
     }
 
+    public void getFriendTodos(String fromUserEmail, Long toUserId) {
+        User fromUser = userRepository.findByEmail(fromUserEmail)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
+        User toUser = userRepository.findById(toUserId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+
+
+    }
 }

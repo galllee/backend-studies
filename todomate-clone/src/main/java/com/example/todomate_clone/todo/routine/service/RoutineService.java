@@ -1,5 +1,7 @@
 package com.example.todomate_clone.todo.routine.service;
 
+import com.example.todomate_clone.todo.category.domain.Category;
+import com.example.todomate_clone.todo.category.repository.CategoryRepository;
 import com.example.todomate_clone.todo.routine.domain.frequencyDetail.MonthlyFrequencyDetail;
 import com.example.todomate_clone.todo.routine.domain.frequencyDetail.WeeklyFrequencyDetail;
 import com.example.todomate_clone.todo.routine.domain.frequencyDetail.YearlyFrequencyDetail;
@@ -31,16 +33,20 @@ public class RoutineService {
     private final RoutineRepository routineRepository;
     private final UserRepository userRepository;
     private final TodoRepository todoRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional
-    public void createRoutine(String email, Long categoryId, CreateRoutineRequest request) {
-        User user = userRepository.findByEmail(email)
+    public void createRoutine(Long userId, Long categoryId, CreateRoutineRequest request) {
+        User user = userRepository.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
 
         routineRepository.save(
                 Routine.builder()
-                        .userId(user.getId())
-                        .categoryId(categoryId)
+                        .user(user)
+                        .category(category)
                         .title(request.getTitle())
                         .startDate(request.getStartDate())
                         .endDate(request.getEndDate())
@@ -101,13 +107,7 @@ public class RoutineService {
 
             for(LocalDate date : dates) {
                 todoRepository.save(
-                        Todo.builder()
-                                .categoryId(categoryId)
-                                .userId(user.getId())
-                                .title(request.getTitle())
-                                .date(date)
-                                .reminderTime(request.getTime())
-                                .build()
+                        Todo.createFromRoutine(user, category, request.getTitle(), date, request.getTime())
                 );
             }
         }
@@ -132,12 +132,13 @@ public class RoutineService {
                 .orElseThrow(() -> new IllegalArgumentException("루틴이 존재하지 않습니다."));
 
         todoRepository.save(
-                Todo.builder()
-                        .categoryId(routine.getCategoryId())
-                        .userId(routine.getUserId())
-                        .title(routine.getTitle())
-                        .date(request.getDate())
-                        .build()
+                Todo.createFromRoutine(
+                        routine.getUser(),
+                        routine.getCategory(),
+                        routine.getTitle(),
+                        request.getDate(),
+                        routine.getTime()
+                )
         );
     }
 }

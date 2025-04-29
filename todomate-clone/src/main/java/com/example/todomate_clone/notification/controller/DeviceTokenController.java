@@ -18,7 +18,7 @@ public class DeviceTokenController {
 
     @PostMapping("/api/v1/device-tokens")
     public ResponseEntity<ApiResponse<?>> registerDeviceToken(@RequestBody RegisterDeviceTokenRequest request) {
-        deviceTokenService.registerDeviceToken(AuthUtil.getLoginUsername(), request);
+        deviceTokenService.registerDeviceToken(AuthUtil.getLoginUserId(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.createSuccessWithNoContent("디바이스 토큰 저장 완료"));

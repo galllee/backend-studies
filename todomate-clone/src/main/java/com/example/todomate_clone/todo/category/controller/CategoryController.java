@@ -19,7 +19,7 @@ public class CategoryController {
     // create category
     @PostMapping("/api/v1/categories")
     public ResponseEntity<ApiResponse<?>> createCategory(@RequestBody CreateCategoryRequest request) {
-        categoryService.createCategory(request, AuthUtil.getLoginUsername());
+        categoryService.createCategory(AuthUtil.getLoginUserId(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.createSuccessWithNoContent("카테고리 생성 완료"));
@@ -63,7 +63,7 @@ public class CategoryController {
 
     @PatchMapping("/api/v1/categories/order")
     public ResponseEntity<ApiResponse<?>> updateCategoryOrders(@RequestBody UpdateCategoryOrdersRequest request) {
-        categoryService.updateCategoryOrders(AuthUtil.getLoginUsername(), request);
+        categoryService.updateCategoryOrders(AuthUtil.getLoginUserId(), request);
 
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("카테고리 순서 변경 완료"));
     }

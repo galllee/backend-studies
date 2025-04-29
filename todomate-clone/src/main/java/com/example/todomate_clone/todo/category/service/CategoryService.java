@@ -22,12 +22,12 @@ public class CategoryService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
-    public void createCategory(CreateCategoryRequest request, String email) {
-        User user = userRepository.findByEmail(email)
+    public void createCategory(Long userId, CreateCategoryRequest request) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
         categoryRepository.save(
                 Category.builder()
-                        .userId(user.getId())
+                        .user(user)
                         .name(request.getName())
                         .visibility(request.getVisibility())
                         .color(request.getColor())
@@ -68,8 +68,8 @@ public class CategoryService {
     }
 
     @Transactional
-    public void updateCategoryOrders(String email, UpdateCategoryOrdersRequest request) {
-        User user = userRepository.findByEmail(email)
+    public void updateCategoryOrders(Long userId, UpdateCategoryOrdersRequest request) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
         List<Category> categories = categoryRepository.findAllByUserIdAndStatus(user.getId(), CategoryStatus.IN_PROGRESS);

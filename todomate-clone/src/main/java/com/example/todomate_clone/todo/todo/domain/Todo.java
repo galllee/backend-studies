@@ -1,6 +1,8 @@
 package com.example.todomate_clone.todo.todo.domain;
 
 
+import com.example.todomate_clone.todo.category.domain.Category;
+import com.example.todomate_clone.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +24,13 @@ public class Todo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long categoryId;
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    Category category;
 
     private String title;
     private LocalDate date; //scheduledDate로 바꿔주기?
@@ -46,9 +53,9 @@ public class Todo {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Todo(Long categoryId, Long userId, String title, LocalDate date, LocalTime reminderTime) {
-        this.categoryId = categoryId;
-        this.userId = userId;
+    public Todo(Category category, User user, String title, LocalDate date, LocalTime reminderTime) {
+        this.category = category;
+        this.user = user;
         this.title = title;
         this.date = date;
         this.reminderTime = reminderTime;
@@ -94,11 +101,35 @@ public class Todo {
         this.orderNum = orderNum;
     }
 
-    public void updateCategory(Long categoryNum) {
-        this.categoryId = categoryNum;
+    public void updateCategory(Category category) {
+        this.category = category;
     }
 
     public void markReminderSent() {
         this.reminderSent = true;
+    }
+
+    public Todo repeatForDate(LocalDate newDate) {
+        return Todo.builder()
+                .category(this.category)
+                .user(this.user)
+                .title(this.title)
+                .date(newDate)
+                .reminderTime(this.reminderTime).build();
+    }
+
+    public static Todo createFromRoutine(
+            User user,
+            Category category,
+            String title,
+            LocalDate date,
+            LocalTime reminderTime
+    ) {
+        return Todo.builder()
+                .user(user)
+                .category(category)
+                .title(title)
+                .date(date)
+                .reminderTime(reminderTime).build();
     }
 }
