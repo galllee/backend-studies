@@ -2,7 +2,8 @@ package com.example.todomate_clone.todo.todo.service;
 
 import com.example.todomate_clone.friend.domain.TodoLike;
 import com.example.todomate_clone.friend.repository.TodoLikeRepository;
-import com.example.todomate_clone.notification.event.TodoCompletedEvent;
+import com.example.todomate_clone.notification.event.todoCompleted.TodoCompletedEvent;
+import com.example.todomate_clone.notification.event.todoLike.TodoLikeEvent;
 import com.example.todomate_clone.todo.category.domain.Category;
 import com.example.todomate_clone.todo.todo.dto.request.TodoOrderItem;
 import com.example.todomate_clone.todo.category.dto.request.UpdateTodoOrdersRequest;
@@ -19,7 +20,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -258,6 +258,8 @@ public class TodoService {
         todoLikeRepository.save(
                 new TodoLike(user, todo)
         );
+
+        eventPublisher.publishEvent(new TodoLikeEvent(user, todo));
     }
 
     @Transactional

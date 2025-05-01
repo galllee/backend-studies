@@ -1,9 +1,8 @@
-package com.example.todomate_clone.notification.event;
+package com.example.todomate_clone.notification.event.todoCompleted;
 
 import com.example.todomate_clone.todo.todo.domain.Todo;
 import com.example.todomate_clone.user.domain.User;
 import lombok.Getter;
-import org.springframework.web.service.annotation.GetExchange;
 
 @Getter
 public class TodoCompletedEvent {
