@@ -12,14 +12,12 @@ import org.apache.http.HttpHeaders;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class FirebaseCloudMessageService {
-
 
     private final String API_URL = "https://fcm.googleapis.com/v1/projects/todomate-clone/messages:send";
     private final ObjectMapper objectMapper;

@@ -4,8 +4,6 @@ import com.example.todomate_clone.global.response.ApiResponse;
 import com.example.todomate_clone.notification.dto.TestAlarmRequest;
 import com.example.todomate_clone.notification.service.FirebaseCloudMessageService;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.protocol.RequestDate;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,5 +26,4 @@ public class FirebaseCloudMessageController {
         );
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("메세지 전송 완료"));
     }
-
 }

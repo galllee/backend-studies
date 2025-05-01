@@ -2,6 +2,7 @@ package com.example.todomate_clone.todo.todo.service;
 
 import com.example.todomate_clone.friend.domain.TodoLike;
 import com.example.todomate_clone.friend.repository.TodoLikeRepository;
+import com.example.todomate_clone.notification.event.TodoCompletedEvent;
 import com.example.todomate_clone.todo.category.domain.Category;
 import com.example.todomate_clone.todo.todo.dto.request.TodoOrderItem;
 import com.example.todomate_clone.todo.category.dto.request.UpdateTodoOrdersRequest;
@@ -14,6 +15,7 @@ import com.example.todomate_clone.user.domain.User;
 import com.example.todomate_clone.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,6 +32,7 @@ public class TodoService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final TodoLikeRepository todoLikeRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void createTodo(Long userId, Long categoryId, CreateTodoRequest request) {
         User user = userRepository.findById(userId)
@@ -262,13 +265,13 @@ public class TodoService {
         todoLikeRepository.deleteById(todoLikeId);
     }
 
-    public void getFriendTodos(String fromUserEmail, Long toUserId) {
-        User fromUser = userRepository.findByEmail(fromUserEmail)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+    @Transactional
+    public void completeTodo(Long todoId) {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두가 존재하지 않습니다."));
 
-        User toUser = userRepository.findById(toUserId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+        todo.markAsCompleted();
 
-
+        eventPublisher.publishEvent(new TodoCompletedEvent(todo.getUser(), todo));
     }
 }

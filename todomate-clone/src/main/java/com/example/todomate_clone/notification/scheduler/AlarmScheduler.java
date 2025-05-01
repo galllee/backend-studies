@@ -35,11 +35,11 @@ public class AlarmScheduler {
                     .map(DeviceToken::getDeviceToken)
                     .collect(Collectors.toList());
 
-            for (String token : tokenStrings) {
+            for (String tokenString : tokenStrings) {
                 try {
-                    System.out.println("알림 발송 시도 - Token: " + token + ", Todo Title: " + todo.getTitle());
+                    System.out.println("알림 발송 시도 - Token: " + tokenString + ", Todo Title: " + todo.getTitle());
                     firebaseCloudMessageService.sendMessageTo(
-                            token,
+                            tokenString,
                             "reminder",
                             todo.getTitle()
                     );

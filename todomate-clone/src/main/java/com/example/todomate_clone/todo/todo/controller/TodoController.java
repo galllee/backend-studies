@@ -189,4 +189,11 @@ public class TodoController {
         return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("좋아요 삭제 완료"));
     }
 
+    @PatchMapping("/api/v1/todos/{todoId}/complete")
+    public ResponseEntity<ApiResponse<?>> completeTodo(@PathVariable Long todoId) {
+        AuthUtil.validateUser();
+        todoService.completeTodo(todoId);
+
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent("투두 완료"));
+    }
 }
