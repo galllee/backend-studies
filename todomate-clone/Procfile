@@ -1,0 +1,2 @@
+web: java -jar build/libs/todomate-clone-0.0.1-SNAPCHAT.jar --spring.profiles.active=dev --spring.config.location=/home/ec2-user/configs/application.yml
+
